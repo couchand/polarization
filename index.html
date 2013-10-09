@@ -69,23 +69,27 @@ var byParty = d3.nest()
     .key(getParty)
     .sortValues(function(a, b) { return d3.ascending(a.congress, b.congress); });
 
-function areaC(d) {
-    d = d.values;
-    if ( !d.length ) return '';
+function area(yu, yd) {
+    return function areaC(d) {
+        d = d.values;
+        if ( !d.length ) return '';
 
-    var up = [], dn = [];
+        var up = [], dn = [];
 
-    d.forEach(function(c) {
-        var x_ = '' + xByCongress(c) + ' ';
-        up.push(x_ + yByNinetyFirst(c));
-        dn.unshift(x_ + yByNinth(c));
-    });
+        d.forEach(function(c) {
+            var x_ = '' + xByCongress(c) + ' ';
+            up.push(x_ + yu(c));
+            dn.unshift(x_ + yd(c));
+        });
 
-    var upl = up.join(' L ');
-    var dnl = dn.join(' L ');
+        var upl = up.join(' L ');
+        var dnl = dn.join(' L ');
 
-    return 'M'+upl+' L '+dnl+' L '+up[0];
+        return 'M'+upl+' L '+dnl+' L '+up[0];
+    };
 }
+
+var areaC = area(yByNinetyFirst, yByNinth);
 
 d3.csv('data/dw-h-60-112.csv', function(error, records) {
 
