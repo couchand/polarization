@@ -96,9 +96,9 @@ function area(yu, yd) {
         var up = [], dn = [];
 
         d.forEach(function(c) {
-            var x_ = 'H ' + xByCongress(c) + ' V ';
-            up.push(x_ + yu(c));
-            dn.unshift(x_ + yd(c));
+            var hx = 'H ' + xByCongress(c);
+            up.push(hx + ' V ' + yu(c));
+            dn.unshift('V ' + yd(c) + ' ' + hx);
         });
 
         up.shift();
