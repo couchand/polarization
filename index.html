@@ -89,6 +89,7 @@ function area(yu, yd) {
     };
 }
 
+var areaB = area(yByThird, yByFirst);
 var areaC = area(yByNinetyFirst, yByNinth);
 
 d3.csv('data/dw-h-60-112.csv', function(error, records) {
@@ -146,6 +147,10 @@ d3.csv('data/dw-h-60-112.csv', function(error, records) {
     party.append('path')
         .attr('fill', function(d) { return colorC(d.key); })
         .attr('d', areaC);
+
+    party.append('path')
+        .attr('fill', function(d) { return colorB(d.key); })
+        .attr('d', areaB);
 
 });
 
