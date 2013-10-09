@@ -149,7 +149,7 @@ d3.csv('data/dw-h-60-112.csv', function(error, records) {
 
     var parties = byParty.entries(caucuses).filter(function(d) { return d.values.length == congressCount });
 
-    var latestCongress = STARTING_CONGRESS + congressCount;
+    var latestCongress = STARTING_CONGRESS + congressCount - 1;
 
     x.domain([STARTING_CONGRESS, latestCongress]);
     y.domain([
