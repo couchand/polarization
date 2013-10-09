@@ -194,6 +194,22 @@ d3.csv('data/dw-h-60-112.csv', function(error, records) {
         .attr('class', 'y axis')
         .call(yAxis);
 
+    svg.append('text')
+        .attr('x', -margin*0.8)
+        .attr('y', -margin*0.3)
+        .text('liberal/conservative');
+
+    svg.append('text')
+        .attr('x', width*0.7)
+        .attr('y', height+margin*0.9)
+        .text('year');
+
+    svg.append('text')
+        .attr('x', width*0.2)
+        .attr('y', 1)
+        .attr('font-size', 13)
+        .text("Distribution of U.S. House DW-NOMINATE scores by party");
+
 });
 
 </script>
