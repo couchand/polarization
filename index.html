@@ -63,6 +63,10 @@ function yBy(dim) {
     return function(d) { return y(dim(d)); }
 }
 
+function congressFromX(d) {
+    return Math.floor(x.invert(d));
+}
+
 function getCongress(d) { return d.congress; }
 function getValues(d) { return d.values; }
 function getParty(d) { return d.party; }
@@ -83,6 +87,10 @@ var byParty = d3.nest()
     .key(getParty)
     .sortKeys(d3.ascending)
     .sortValues(function(a, b) { return d3.ascending(a.congress, b.congress); });
+
+var byPartyThenCongress = d3.nest()
+    .key(getParty)
+    .key(getCongress);
 
 function makeYear(congress) {
     return new Date(1786 + 2*congress, 0, 1);
@@ -207,6 +215,28 @@ d3.csv('data/dw-h-60-112.csv', function(error, records) {
         .attr('stroke-width', 2)
         .attr('stroke', function(d) { return colorA(d[0].party); })
         .attr('d', lineA);
+
+    var partyToCongressToCaucus = byPartyThenCongress.map(caucuses);
+
+    party.on('mousemove', function(d) {
+        var party = d.key;
+        var congress = congressFromX(d3.mouse(this)[0]);
+
+        var highlight = svg.selectAll('.highlight')
+            .data(partyToCongressToCaucus[party][congress]);
+
+        highlight.enter().append('rect')
+            .attr('class', 'highlight')
+            .attr('width', x(100)-x(99));
+
+        highlight
+            .attr('x', xByCongress)
+            .attr('y', yByTopline)
+            .attr('fill', colorByParty(colorB))
+            .attr('height', function(d) {
+                return yByBottomline(d) - yByTopline(d);
+            });
+    });
 
     svg.append('g')
         .attr('class', 'x axis')
