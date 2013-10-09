@@ -26,6 +26,9 @@ var width = 600,
     height = 400,
     margin = 30;
 
+var widthSvg = width + 2*margin,
+    heightSvg = height + 2*margin;
+
 var x = d3.scale.linear()
     .range([0, width]);
 var y = d3.scale.linear()
@@ -137,8 +140,8 @@ d3.csv('data/dw-h-60-112.csv', function(error, records) {
 
     var svg = d3.select('body')
         .append('svg')
-        .attr('width', width)
-        .attr('height', height)
+        .attr('width', widthSvg)
+        .attr('height', heightSvg)
         .append('g')
         .attr('transform', 'translate('+margin+','+margin+')');
 
