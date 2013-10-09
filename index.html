@@ -89,6 +89,9 @@ function area(yu, yd) {
     };
 }
 
+var lineA = d3.svg.line()
+    .x(xByCongress)
+    .y(yByMedian);
 var areaB = area(yByThird, yByFirst);
 var areaC = area(yByNinetyFirst, yByNinth);
 
@@ -151,6 +154,13 @@ d3.csv('data/dw-h-60-112.csv', function(error, records) {
     party.append('path')
         .attr('fill', function(d) { return colorB(d.key); })
         .attr('d', areaB);
+
+    party.append('path')
+        .datum(getValues)
+        .attr('fill', 'none')
+        .attr('stroke-width', 2)
+        .attr('stroke', function(d) { return colorA(d[0].party); })
+        .attr('d', lineA);
 
 });
 
