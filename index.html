@@ -142,11 +142,11 @@ d3.csv('data/dw-h-60-112.csv', function(error, records) {
             caucuses.push({
                 party: party,
                 congress: congress,
-                bottomline: d3.quantile(vals, 0.09),
+                bottomline: d3.quantile(vals, 0.01),
                 first: d3.quantile(vals, 0.25),
                 median: d3.quantile(vals, 0.50),
                 third: d3.quantile(vals, 0.75),
-                topline: d3.quantile(vals, 0.91)
+                topline: d3.quantile(vals, 0.99)
             });
         });
     });
