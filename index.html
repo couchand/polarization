@@ -69,22 +69,9 @@ var byParty = d3.nest()
     .key(getParty)
     .sortValues(function(a, b) { return d3.ascending(a.congress, b.congress); });
 
-// construct the area paths
-
-// areaC - the background
-//   d - a list of values
-//   return - path string
 function areaC(d) {
-
     d = d.values;
-
     if ( !d.length ) return '';
-
-    var lastIndex = d.length - 1,
-        ul = '' + xByCongress(d[0]) + ' ' + yByNinetyFirst(d[0]),
-        ur = '' + xByCongress(d[lastIndex]) + ' ' + yByNinetyFirst(d[lastIndex]),
-        dl = '' + xByCongress(d[0]) + ' ' + yByNinth(d[0]),
-        dr = '' + xByCongress(d[lastIndex]) + ' ' + yByNinth(d[lastIndex]);
 
     var up = [], dn = [];
 
@@ -97,9 +84,7 @@ function areaC(d) {
     var upl = up.join(' L ');
     var dnl = dn.join(' L ');
 
-    return 'M'+upl+' L '+dnl+' L '+ul;
-
-    return 'M'+ul+' L '+ur+' L '+dr+' L '+dl+' L '+ul;
+    return 'M'+upl+' L '+dnl+' L '+up[0];
 }
 
 d3.csv('data/dw-h-60-112.csv', function(error, records) {
