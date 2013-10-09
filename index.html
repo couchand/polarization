@@ -47,15 +47,11 @@ var colorC = d3.scale.ordinal()
     .domain(['Democrat', 'Republican'])
     .range(["#C6DBEF", "#FCBBA1"]);
 
-var xAxis = d3.svg.axis()
-    .scale(x)
-    .orient('bottom');
 var yAxis = d3.svg.axis()
-    .scale(y)
-    .orient('left');
-
-var yearAxis = d3.svg.axis()
-    .orient('top')
+    .orient('left')
+    .scale(y);
+var xAxis = d3.svg.axis()
+    .orient('bottom')
     .scale(year);
 
 function colorByParty(color) {
@@ -197,10 +193,6 @@ d3.csv('data/dw-h-60-112.csv', function(error, records) {
     svg.append('g')
         .attr('class', 'y axis')
         .call(yAxis);
-
-    svg.append('g')
-        .attr('class', 'year axis')
-        .call(yearAxis);
 
 });
 
