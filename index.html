@@ -95,19 +95,23 @@ function area(yu, yd) {
         var up = [], dn = [];
 
         d.forEach(function(c) {
-            var x_ = '' + xByCongress(c) + ' ';
+            var x_ = 'H ' + xByCongress(c) + ' V ';
             up.push(x_ + yu(c));
             dn.unshift(x_ + yd(c));
         });
 
-        var upl = up.join(' L ');
-        var dnl = dn.join(' L ');
+        up.shift();
+        var start = xByCongress(d[0]) + ' ' + yu(d[0]);
 
-        return 'M'+upl+' L '+dnl+' L '+up[0];
+        var upl = up.join(' ');
+        var dnl = dn.join(' ');
+
+        return 'M'+start+' '+upl+' '+dnl+' L '+start;
     };
 }
 
 var lineA = d3.svg.line()
+    .interpolate('step-after')
     .x(xByCongress)
     .y(yByMedian);
 var areaB = area(yByThird, yByFirst);
@@ -148,6 +152,17 @@ d3.csv('data/dw-h-60-112.csv', function(error, records) {
     });
 
     var parties = byParty.entries(caucuses).filter(function(d) { return d.values.length == congressCount });
+    parties.forEach(function(p) {
+        var last = p.values[p.values.length-1];
+        var extra = {};
+
+        for ( var k in last ) {
+            extra[k] = last[k];
+        }
+
+        extra.congress += 1;
+        p.values.push(extra);
+    });
 
     var partiesToShow = {};
     parties.forEach(function(p) { partiesToShow[p.key] = 1; });
@@ -156,7 +171,7 @@ d3.csv('data/dw-h-60-112.csv', function(error, records) {
         return caucus.party in partiesToShow;
     });
 
-    var latestCongress = STARTING_CONGRESS + congressCount - 1;
+    var latestCongress = STARTING_CONGRESS + congressCount;
 
     x.domain([STARTING_CONGRESS, latestCongress]);
     y.domain([
