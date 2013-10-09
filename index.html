@@ -81,6 +81,7 @@ var byCongressThenParty = d3.nest()
 
 var byParty = d3.nest()
     .key(getParty)
+    .sortKeys(d3.ascending)
     .sortValues(function(a, b) { return d3.ascending(a.congress, b.congress); });
 
 function makeYear(congress) {
