@@ -22,6 +22,8 @@ body {
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
 
+var STARTING_CONGRESS = 62;
+
 var width = 600,
     height = 400,
     margin = 30;
@@ -33,6 +35,8 @@ var x = d3.scale.linear()
     .range([0, width]);
 var y = d3.scale.linear()
     .range([height, 0]);
+var year = d3.time.scale()
+    .range([0, width]);
 var colorA = d3.scale.ordinal()
     .domain(['Democrat', 'Republican'])
     .range(["#2171B5", "#CB181D"]);
@@ -49,6 +53,10 @@ var xAxis = d3.svg.axis()
 var yAxis = d3.svg.axis()
     .scale(y)
     .orient('left');
+
+var yearAxis = d3.svg.axis()
+    .orient('top')
+    .scale(year);
 
 function colorByParty(color) {
     return function(d) { return color(d.party); };
@@ -78,6 +86,10 @@ var byCongressThenParty = d3.nest()
 var byParty = d3.nest()
     .key(getParty)
     .sortValues(function(a, b) { return d3.ascending(a.congress, b.congress); });
+
+function makeYear(congress) {
+    return new Date(1786 + 2*congress, 0, 1);
+}
 
 function area(yu, yd) {
     return function areaC(d) {
@@ -112,7 +124,9 @@ d3.csv('data/dw-h-60-112.csv', function(error, records) {
         d.dim1 = +d.dim1;
     });
 
-    var nested = byCongressThenParty.entries(records);
+    var nested = byCongressThenParty.entries(
+        records.filter(function(d) { return d.congress >= STARTING_CONGRESS; })
+    );
 
     var congressCount = nested.length;
 
@@ -139,11 +153,14 @@ d3.csv('data/dw-h-60-112.csv', function(error, records) {
 
     var parties = byParty.entries(caucuses).filter(function(d) { return d.values.length == congressCount });
 
-    x.domain( d3.extent(caucuses, getCongress) );
+    var latestCongress = STARTING_CONGRESS + congressCount;
+
+    x.domain([STARTING_CONGRESS, latestCongress]);
     y.domain([
         d3.min(caucuses, function(d) { return d.ninth; }),
         d3.max(caucuses, function(d) { return d.ninetyfirst; })
     ]);
+    year.domain([makeYear(STARTING_CONGRESS), makeYear(latestCongress)]);
 
     var svg = d3.select('body')
         .append('svg')
@@ -180,6 +197,10 @@ d3.csv('data/dw-h-60-112.csv', function(error, records) {
     svg.append('g')
         .attr('class', 'y axis')
         .call(yAxis);
+
+    svg.append('g')
+        .attr('class', 'year axis')
+        .call(yearAxis);
 
 });
 
