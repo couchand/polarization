@@ -13,7 +13,7 @@ body {
     shape-rendering: crispEdges;
 }
 
-.party {
+.party, .highlight {
     opacity: 0.5;
 }
 
@@ -264,9 +264,25 @@ d3.csv('data/dw-h-60-112.csv', function(error, records) {
             .data([congressToCaucuses[congress]]);
 
         tt.enter().append('div')
+            .style('display', 'inline-block')
             .attr('class', 'tooltip');
 
         tt.html(tooltip);
+
+        var highlight = svg.selectAll('.highlight')
+            .data(congressToCaucuses[congress]);
+
+        highlight.enter().append('rect')
+            .attr('class', 'highlight')
+            .attr('width', x(100)-x(99));
+
+        highlight
+            .attr('x', xByCongress)
+            .attr('y', yByTopline)
+            .attr('fill', colorByParty(colorB))
+            .attr('height', function(d) {
+                return yByBottomline(d) - yByTopline(d);
+            });
     });
 
     svg.append('g')
