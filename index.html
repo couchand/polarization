@@ -82,6 +82,12 @@ function yByMedian(d) { return y(d.median); }
 function yByFirst(d) { return y(d.first); }
 function yByBottomline(d) { return y(d.bottomline); }
 
+function formatTopline(d) { return formatScore(d.topline); }
+function formatThird(d) { return formatScore(d.third); }
+function formatMedian(d) { return formatScore(d.median); }
+function formatFirst(d) { return formatScore(d.first); }
+function formatBottomline(d) { return formatScore(d.bottomline); }
+
 var byCongressThenParty = d3.nest()
     .key(getCongress)
     .key(getParty)
@@ -92,25 +98,38 @@ var byParty = d3.nest()
     .sortKeys(d3.ascending)
     .sortValues(function(a, b) { return d3.ascending(a.congress, b.congress); });
 
-var byPartyThenCongress = d3.nest()
-    .key(getParty)
+var byCongress = d3.nest()
     .key(getCongress);
 
 function makeYear(congress) {
     return new Date(1786 + 2*congress, 0, 1);
 }
 
+function addRow(name, getCell, d) {
+    var row = '<tr><th>' + name + '</th>';
+
+    d.forEach(function(caucus) {
+        row += '<td>' + getCell(caucus) + '</td>';
+    });
+
+    return row + '</tr>';
+}
+
 function tooltip(d) {
-    return '' +
-        'Congress: ' + d.congress + "<br>" +
-        'Election year: ' + formatYear(makeYear(d.congress)) + "<br>" +
-        'Party: ' + d.party + "<br>" +
-        'Representatives: ' + d.count + "<br>" +
-        '99th Percentile: ' + formatScore(d.topline) + "<br>" +
-        '75th Percentile: ' + formatScore(d.third) + "<br>" +
-        'Median: ' + formatScore(d.median) + "<br>" +
-        '25th Percentile: ' + formatScore(d.first) + "<br>" +
-        '1st Percentile: ' + formatScore(d.bottomline);
+    var table = '';
+
+    table += '<tr><th>Congress</th><th colspan="'+d.length+'">'+d[0].congress+'</th></tr>';
+    table += '<tr><th>Election year</th><th colspan="'+d.length+'">'+formatYear(makeYear(d[0].congress))+'</th></tr>';
+
+    table += addRow('Party', getParty, d);
+    table += addRow('Representatives', function(d) { return d.count; }, d);
+    table += addRow('99th percentile', formatTopline, d);
+    table += addRow('75th percentile', formatThird, d);
+    table += addRow('Median', formatMedian, d);
+    table += addRow('25th percentile', formatFirst, d);
+    table += addRow('1st percentile', formatBottomline, d);
+
+    return '<table>' + table + '</table>';
 }
 
 function area(yu, yd) {
@@ -214,9 +233,6 @@ d3.csv('data/dw-h-60-112.csv', function(error, records) {
         .append('g')
         .attr('transform', 'translate('+margin+','+margin+')');
 
-    var tooltipDiv = d3.select('body')
-        .append('div');
-
     var party = svg.selectAll('.party')
         .data(parties)
         .enter().append('g')
@@ -237,29 +253,14 @@ d3.csv('data/dw-h-60-112.csv', function(error, records) {
         .attr('stroke', function(d) { return colorA(d[0].party); })
         .attr('d', lineA);
 
-    var partyToCongressToCaucus = byPartyThenCongress.map(caucuses);
+    var congressToCaucuses = byCongress.map(caucuses);
 
     party.on('mousemove', function(d) {
         var party = d.key;
         var congress = congressFromX(d3.mouse(this)[0]);
 
-        var highlight = svg.selectAll('.highlight')
-            .data(partyToCongressToCaucus[party][congress]);
-
-        highlight.enter().append('rect')
-            .attr('class', 'highlight')
-            .attr('width', x(100)-x(99));
-
-        highlight
-            .attr('x', xByCongress)
-            .attr('y', yByTopline)
-            .attr('fill', colorByParty(colorB))
-            .attr('height', function(d) {
-                return yByBottomline(d) - yByTopline(d);
-            });
-
-        var tt = tooltipDiv.selectAll('.tooltip')
-            .data(partyToCongressToCaucus[party][congress]);
+        var tt = d3.select('body').selectAll('.tooltip')
+            .data([congressToCaucuses[congress]]);
 
         tt.enter().append('div')
             .attr('class', 'tooltip');
