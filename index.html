@@ -31,6 +31,9 @@ var width = 600,
 var widthSvg = width + 2*margin,
     heightSvg = height + 2*margin;
 
+var formatYear = d3.time.format('%Y');
+var formatScore = d3.format('0.2f');
+
 var x = d3.scale.linear()
     .range([0, width]);
 var y = d3.scale.linear()
@@ -48,6 +51,7 @@ var colorC = d3.scale.ordinal()
     .range(["#C6DBEF", "#FCBBA1"]);
 
 var yAxis = d3.svg.axis()
+    .tickFormat(formatScore)
     .orient('left')
     .scale(y);
 var xAxis = d3.svg.axis()
@@ -94,6 +98,19 @@ var byPartyThenCongress = d3.nest()
 
 function makeYear(congress) {
     return new Date(1786 + 2*congress, 0, 1);
+}
+
+function tooltip(d) {
+    return '' +
+        'Congress: ' + d.congress + "<br>" +
+        'Election year: ' + formatYear(makeYear(d.congress)) + "<br>" +
+        'Party: ' + d.party + "<br>" +
+        'Representatives: ' + d.count + "<br>" +
+        '99th Percentile: ' + formatScore(d.topline) + "<br>" +
+        '75th Percentile: ' + formatScore(d.third) + "<br>" +
+        'Median: ' + formatScore(d.median) + "<br>" +
+        '25th Percentile: ' + formatScore(d.first) + "<br>" +
+        '1st Percentile: ' + formatScore(d.bottomline);
 }
 
 function area(yu, yd) {
@@ -151,6 +168,7 @@ d3.csv('data/dw-h-60-112.csv', function(error, records) {
             caucuses.push({
                 party: party,
                 congress: congress,
+                count: vals.length,
                 bottomline: d3.quantile(vals, 0.01),
                 first: d3.quantile(vals, 0.25),
                 median: d3.quantile(vals, 0.50),
@@ -196,6 +214,9 @@ d3.csv('data/dw-h-60-112.csv', function(error, records) {
         .append('g')
         .attr('transform', 'translate('+margin+','+margin+')');
 
+    var tooltipDiv = d3.select('body')
+        .append('div');
+
     var party = svg.selectAll('.party')
         .data(parties)
         .enter().append('g')
@@ -236,6 +257,14 @@ d3.csv('data/dw-h-60-112.csv', function(error, records) {
             .attr('height', function(d) {
                 return yByBottomline(d) - yByTopline(d);
             });
+
+        var tt = tooltipDiv.selectAll('.tooltip')
+            .data(partyToCongressToCaucus[party][congress]);
+
+        tt.enter().append('div')
+            .attr('class', 'tooltip');
+
+        tt.html(tooltip);
     });
 
     svg.append('g')
