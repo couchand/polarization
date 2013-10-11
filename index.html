@@ -28,7 +28,7 @@ var width = 700,
     height = 400,
     margin = 50;
 
-var widthSvg = width + 2*margin,
+var widthSvg = width + 3*margin,
     heightSvg = height + 2*margin;
 
 var formatYear = d3.time.format('%Y');
@@ -162,6 +162,35 @@ var lineA = d3.svg.line()
     .y(yByMedian);
 var areaB = area(yByThird, yByFirst);
 var areaC = area(yByTopline, yByBottomline);
+
+function labelParts(caucus) {
+    return function(svg) {
+        svg.append('text')
+            .attr('x', width+3)
+            .attr('y', yByTopline(caucus)+5)
+            .text('99th percentile');
+
+        svg.append('text')
+            .attr('x', width+3)
+            .attr('y', yByThird(caucus)+5)
+            .text('75th percentile');
+
+        svg.append('text')
+            .attr('x', width+3)
+            .attr('y', yByMedian(caucus)+5)
+            .text('Median');
+
+        svg.append('text')
+            .attr('x', width+3)
+            .attr('y', yByFirst(caucus)+5)
+            .text('25th percentile');
+
+        svg.append('text')
+            .attr('x', width+3)
+            .attr('y', yByBottomline(caucus)+5)
+            .text('1st percentile');
+    };
+}
 
 d3.csv('data/dw-h-60-112.csv', function(error, records) {
 
@@ -309,6 +338,9 @@ d3.csv('data/dw-h-60-112.csv', function(error, records) {
         .attr('y', 1)
         .attr('font-size', 13)
         .text("Distribution of U.S. House DW-NOMINATE scores by party");
+
+    svg.call(labelParts(parties[0].values[congressCount-1]));
+    svg.call(labelParts(parties[1].values[congressCount-1]));
 
 });
 
