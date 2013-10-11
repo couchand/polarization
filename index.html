@@ -28,7 +28,7 @@ var width = 700,
     height = 400,
     margin = 50;
 
-var widthSvg = width + 3*margin,
+var widthSvg = width + 2*margin + 60,
     heightSvg = height + 2*margin;
 
 var formatYear = d3.time.format('%Y');
@@ -166,29 +166,22 @@ var areaC = area(yByTopline, yByBottomline);
 function labelParts(caucus) {
     return function(svg) {
         svg.append('text')
+            .attr('text-anchor', 'top')
             .attr('x', width+3)
-            .attr('y', yByTopline(caucus)+5)
-            .text('99th percentile');
+            .attr('y', yByTopline(caucus)+11)
+            .text('98% of '+caucus.party+'s');
 
         svg.append('text')
+            .attr('text-anchor', 'top')
             .attr('x', width+3)
-            .attr('y', yByThird(caucus)+5)
-            .text('75th percentile');
+            .attr('y', yByThird(caucus)+11)
+            .text('50% of '+caucus.party+'s');
 
         svg.append('text')
+            .attr('text-anchor', 'top')
             .attr('x', width+3)
             .attr('y', yByMedian(caucus)+5)
             .text('Median');
-
-        svg.append('text')
-            .attr('x', width+3)
-            .attr('y', yByFirst(caucus)+5)
-            .text('25th percentile');
-
-        svg.append('text')
-            .attr('x', width+3)
-            .attr('y', yByBottomline(caucus)+5)
-            .text('1st percentile');
     };
 }
 
